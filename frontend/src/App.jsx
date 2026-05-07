@@ -1,3 +1,4 @@
+import React from "react";
 import { FolderKanban, LayoutDashboard, ListTodo, LogOut } from "lucide-react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";

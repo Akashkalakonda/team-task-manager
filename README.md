@@ -97,20 +97,35 @@ GET    /api/dashboard
 4. Add backend variables:
    - `DATABASE_URL`
    - `JWT_SECRET`
-   - `FRONTEND_URL`
+   - `FRONTEND_URL` with the deployed frontend URL. For multiple allowed origins, use comma-separated URLs.
    - `NODE_ENV=production`
-5. Set the backend start command to:
+5. Deploy the backend. `backend/railway.json` runs:
 
 ```bash
-npm run prisma:deploy && npm start
+npm start
 ```
 
-6. Deploy the frontend from the `frontend` folder.
+`npm start` runs `prisma migrate deploy` before starting Express.
+
+6. Deploy the frontend from the `frontend` folder. `frontend/railway.json` builds and serves the Vite production build.
 7. Set `VITE_API_URL` to the deployed backend API URL, for example:
 
 ```txt
 https://your-backend.up.railway.app/api
 ```
+
+8. After the frontend URL is available, update the backend `FRONTEND_URL` variable to that exact URL and redeploy the backend if needed.
+
+## Verification
+
+With the backend running locally:
+
+```bash
+cd backend
+npm run smoke:test
+```
+
+The smoke test verifies signup, protected routes, Admin/Member restrictions, project creation, member assignment, task creation, task status updates, dashboard counts, and cleanup.
 
 ## Role Rules
 

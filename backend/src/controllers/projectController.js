@@ -166,7 +166,14 @@ export const addProjectMember = async (req, res, next) => {
       throw new HttpError(403, "Only admins can manage members");
     }
 
-    const user = await prisma.user.findUnique({ where: { id: req.body.userId } });
+    const [project, user] = await Promise.all([
+      prisma.project.findUnique({ where: { id: req.params.id }, select: { id: true } }),
+      prisma.user.findUnique({ where: { id: req.body.userId } })
+    ]);
+
+    if (!project) {
+      throw new HttpError(404, "Project not found");
+    }
 
     if (!user) {
       throw new HttpError(404, "User not found");

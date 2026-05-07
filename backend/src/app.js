@@ -10,15 +10,26 @@ import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
 
 export const app = express();
 
-const allowedOrigin = process.env.FRONTEND_URL || "http://localhost:5173";
+const allowedOrigins = (process.env.FRONTEND_URL || "http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
 app.use(
   cors({
-    origin: allowedOrigin,
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      const error = new Error("Not allowed by CORS");
+      error.statusCode = 403;
+      return callback(error);
+    },
     credentials: true
   })
 );
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
 app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 
 app.get("/health", (_req, res) => {

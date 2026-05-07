@@ -1,3 +1,4 @@
+import React from "react";
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import ProjectCard from "../components/ProjectCard.jsx";

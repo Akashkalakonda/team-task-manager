@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000/api").replace(/\/$/, "");
 
 const request = async (path, options = {}, token) => {
   const response = await fetch(`${API_URL}${path}`, {
@@ -14,7 +14,10 @@ const request = async (path, options = {}, token) => {
     return null;
   }
 
-  const data = await response.json();
+  const contentType = response.headers.get("content-type") || "";
+  const data = contentType.includes("application/json")
+    ? await response.json()
+    : { message: await response.text() };
 
   if (!response.ok) {
     throw new Error(data.message || "Request failed");

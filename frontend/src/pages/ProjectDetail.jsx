@@ -1,3 +1,4 @@
+import React from "react";
 import { Plus, Trash2, UserPlus } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -35,8 +36,10 @@ export default function ProjectDetail() {
 
   useEffect(() => {
     loadProject();
-    userApi.list(token).then((data) => setUsers(data.users)).catch(() => setUsers([]));
-  }, [projectId, token]);
+    if (isAdmin) {
+      userApi.list(token).then((data) => setUsers(data.users)).catch(() => setUsers([]));
+    }
+  }, [projectId, token, isAdmin]);
 
   const memberIds = useMemo(() => new Set(project?.members?.map((member) => member.userId) || []), [project]);
   const assignableUsers = users.filter((user) => memberIds.has(user.id));
@@ -77,13 +80,25 @@ export default function ProjectDetail() {
   };
 
   const handleDeleteProject = async () => {
-    await projectApi.remove(projectId, token);
-    navigate("/projects");
+    setError("");
+
+    try {
+      await projectApi.remove(projectId, token);
+      navigate("/projects");
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   const handleStatusChange = async (taskId, status) => {
-    await taskApi.updateStatus(taskId, status, token);
-    loadProject();
+    setError("");
+
+    try {
+      await taskApi.updateStatus(taskId, status, token);
+      loadProject();
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   if (!project) {

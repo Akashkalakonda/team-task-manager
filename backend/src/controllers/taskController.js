@@ -104,6 +104,15 @@ export const createTask = async (req, res, next) => {
       throw new HttpError(403, "Only admins can create tasks for this project");
     }
 
+    const project = await prisma.project.findUnique({
+      where: { id: req.body.projectId },
+      select: { id: true }
+    });
+
+    if (!project) {
+      throw new HttpError(404, "Project not found");
+    }
+
     if (req.body.assignedToId) {
       const assigneeIsMember = await isProjectMember(req.body.projectId, req.body.assignedToId);
 
